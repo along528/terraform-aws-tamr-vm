@@ -44,12 +44,21 @@ data "aws_iam_policy_document" "emr_creator_policy" {
       "elasticmapreduce:RunJobFlow",
       "elasticmapreduce:DescribeRepository",
       "elasticmapreduce:DescribeSecurityConfiguration",
-      "elasticmapreduce:ListClusters"
     ]
     resources = [
       "arn:${var.arn_partition}:elasticmapreduce:*"
     ]
   }
+
+  statement {
+    effect = "Allow"
+    actions = [
+      "elasticmapreduce:ListClusters"
+    ]
+    resources = ["*"]
+  }
+
+
   statement {
     effect = "Allow"
     actions = [
