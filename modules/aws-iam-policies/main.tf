@@ -41,7 +41,10 @@ data "aws_iam_policy_document" "emr_creator_policy" {
   statement {
     effect = "Allow"
     actions = [
-      "elasticmapreduce:RunJobFlow"
+      "elasticmapreduce:RunJobFlow",
+      "elasticmapreduce:DescribeRepository",
+      "elasticmapreduce:DescribeSecurityConfiguration",
+      "elasticmapreduce:ListClusters"
     ]
     resources = [
       "arn:${var.arn_partition}:elasticmapreduce:*"
@@ -51,16 +54,14 @@ data "aws_iam_policy_document" "emr_creator_policy" {
     effect = "Allow"
     actions = [
       "elasticmapreduce:DescribeCluster",
-      "elasticmapreduce:DescribeEditor",
       "elasticmapreduce:DescribeJobFlows",
-      "elasticmapreduce:DescribeNotebookExecution",
-      "elasticmapreduce:DescribeRepository",
-      "elasticmapreduce:DescribeSecurityConfiguration",
-      "elasticmapreduce:DescribeStep",
-      "elasticmapreduce:DescribeStudio",
-      "elasticmapreduce:ListClusters"
+      "elasticmapreduce:DescribeStep"
     ]
-    resources = ["*"]
+    resources = length(var.tamr_emr_cluster_ids) == 0 ?
+    ["arn:${var.arn_partition}:elasticmapreduce:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/*"] :
+    [for emr_id in var.tamr_emr_cluster_ids :
+    "arn:${var.arn_partition}:elasticmapreduce:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:cluster/${emr_id}"
+    ]
   }
 }
 
